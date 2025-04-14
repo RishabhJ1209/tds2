@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TDS Calculator </title>
+
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+     :root {
+      --bg: #f0f2f5;
+      --text: #333;
+      --box: #ffffff;
+      --input-border: #ccc;
+      --success-bg: #e6f9ec;
+      --success-border: #b2e4c3;
+      --success-text: #2f855a;
+      --toast-bg: #333;
+      --toast-text: #fff;
+    }
+
+    body.dark {
+      --bg: #121212;
+      --text: #f1f1f1;
+      --box: #1e1e1e;
+      --input-border: #444;
+      --success-bg: #263d2b;
+      --success-border: #3c5541;
+      --success-text: #9ae6b4;
+      --toast-bg: #eee;
+      --toast-text: #000;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .Form {
+      background-color: var(--box);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      transition: background 0.3s;
+    }
+
+    .Header {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .Amount {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      margin-bottom: 20px;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+
+    .Amount:focus {
+      border-color: #007bff;
+    }
+
+    .MessageDiv {
+      background-color: #e6f9ec;
+      border: 1px solid #b2e4c3;
+      color: #2f855a;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .MessageDiv:hover {
+      background-color: #d2f3df;
+    }
+
+    .MessageDiv {
+      background-color: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: var(--success-text);
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .MessageDiv:hover {
+      background-color: #cdeedc;
+    }
+
+    #Toast {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--toast-bg);
+      color: var(--toast-text, #fff);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      z-index: 999;
+      transition: background 0.3s;
+    }
+
+    .toggle-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--text);
+      transition: color 0.3s;
+    }
+  </style>
+</head>
+<body>
+    <button class="toggle-btn" id="toggleMode">Click 🌙</button>
+  <div class="Form">
+    
+    <h1 class="Header">💰 TDS Calculator</h1>
+
+    <label for="amount">Enter Amount (INR):</label>
+    <input type="number" id="amount" class="Amount" placeholder="e.g. 10000" />
+
+    <div id="MessageDiv" class="MessageDiv">
+      ✅ You will get ₹<span id="creditamount">0.00</span> in your bank & ₹<span id="finaltdsamount">0.00</span> TDS will be submitted to your PAN.
+    </div>
+
+    <div id="Toast">Copied!</div>
+  </div>
+
+  <script>
+    const TotalAmount = document.getElementById('amount');
+    const CreditedAmount = document.getElementById('creditamount');
+    const TDSAmount = document.getElementById('finaltdsamount');
+    const toast = document.getElementById('Toast');
+    const MessageDiv = document.getElementById('MessageDiv');
+    const toggleBtn = document.getElementById('toggleMode');
+    const body = document.body;
+
+
+    TotalAmount.addEventListener('input', () => {
+      const Amount = parseFloat(TotalAmount.value);
+      if (isNaN(Amount) || Amount < 0) {
+        CreditedAmount.textContent = "0.00";
+        TDSAmount.textContent = "0.00";
+        return;
+      }
+
+      const tds = Amount * 0.01;
+      const FinalCreditAmount = Amount - tds;
+
+      CreditedAmount.textContent = FinalCreditAmount.toFixed(2);
+      TDSAmount.textContent = tds.toFixed(2);
+    });
+
+    MessageDiv.addEventListener('click', () => {
+      const credited = CreditedAmount.textContent;
+      const tds = TDSAmount.textContent;
+      const fullMessage = `✅ You will get ₹${credited} in your bank & ₹${tds} TDS will be submitted to your PAN.`;
+      navigator.clipboard.writeText(fullMessage).then(() => {
+        showToast();
+      });
+    });
+
+    function showToast() {
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 1500);
+    }
+    toggleBtn.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      toggleBtn.textContent = body.classList.contains('dark') ? 'Dark mode ☀️' : 'Light mode🌙';
+    });
+  </script>
+</body>
+</html>
