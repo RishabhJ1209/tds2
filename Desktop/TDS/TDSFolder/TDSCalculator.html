@@ -182,7 +182,7 @@
         return;
       }
 
-      const tds = Amount * 0.01;
+      const tds = Math.round(Amount * 0.01);
       const FinalCreditAmount = Amount - tds;
 
       CreditedAmount.textContent = FinalCreditAmount.toFixed(2);
